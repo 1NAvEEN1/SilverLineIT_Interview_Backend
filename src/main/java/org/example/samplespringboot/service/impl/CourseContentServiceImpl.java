@@ -15,11 +15,16 @@ import org.example.samplespringboot.service.CourseContentService;
 import org.example.samplespringboot.service.FileStorageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -102,24 +107,59 @@ public class CourseContentServiceImpl implements CourseContentService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public Resource downloadFile(Long id) {
-        CourseContent content = courseContentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Content not found with id: " + id));
 
-        return fileStorageService.loadFileAsResource(content.getFileUrl());
-    }
+
 
     @Override
-    @Transactional
-    public void deleteContent(Long id) {
-        CourseContent content = courseContentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Content not found with id: " + id));
+    public CourseContent uploadDocument(MultipartFile submissions,String fileName,String documentDir) {
 
-        // Soft delete: mark as deleted instead of removing from database
-        content.setIsDeleted(true);
-        content.setDeletedAt(java.time.LocalDateTime.now());
-        courseContentRepository.save(content);
+        long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+        if (submissions.getSize() > MAX_FILE_SIZE) {
+            throw new RuntimeException("File size exceeds the limit of 10MB.");
+        }
+
+        String contentType = submissions.getContentType();
+        List<String> allowedTypes = List.of(
+                "application/pdf",
+                "video/mp4",
+                "image/jpeg",
+                "image/png"
+        );
+
+        if (!allowedTypes.contains(contentType)) {
+            throw new RuntimeException("Invalid file type. Allowed: PDF, MP4, JPG, PNG");
+        }
+
+        String documentFileName = "";
+        CourseContent courseContent = null;
+        try {
+            final Path root = Paths.get(documentDir);
+
+            boolean directory = Files.isDirectory(root);
+            if (!directory) {
+                Files.createDirectory(root);
+            }
+
+            documentFileName = new Date().getTime() + "-" + submissions.getOriginalFilename().replaceAll("\\s+", "_");
+
+            Files.copy(submissions.getInputStream(), root.resolve(documentFileName));
+
+
+            courseContent = new CourseContent();
+            courseContent.setFileNameOriginal(documentFileName);
+            courseContent.setFileName(fileName);
+            courseContent.setFilePath(documentDir);
+            courseContent.setFileType(contentType);
+            courseContent.setFileSize(submissions.getSize());
+
+            courseContent = courseContentRepository.save(courseContent);
+
+
+        } catch (Exception e) {
+            throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
+        }
+
+        return courseContent;
     }
 
     private void validateFile(MultipartFile file) {
