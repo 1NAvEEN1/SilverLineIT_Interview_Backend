@@ -8,39 +8,35 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "users")
+@Table(name = "courses")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class Course {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
-    private String firstName;
+    @Column(nullable = false, length = 200)
+    private String courseName;
 
-    @Column(nullable = false, length = 100)
-    private String lastName;
+    @Column(length = 20, unique = true)
+    private String courseCode;
 
-    @Column(nullable = false, unique = true, length = 150)
-    private String email;
+    @Column(length = 1000)
+    private String description;
 
-    @Column(nullable = false)
-    private String password;
+    @ManyToOne
+    @JoinColumn(name = "instructor_id", nullable = false)
+    private User instructor;
 
-    @Column(length = 10)
-    private String phoneNumber;
-
-    @Column(length = 255)
-    private String address;
-
-    @OneToOne
-    @JoinColumn(name = "role_id")
-    private UserRole role;
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CourseContent> contents = new ArrayList<>();
 
     @CreationTimestamp
     @Column(updatable = false)

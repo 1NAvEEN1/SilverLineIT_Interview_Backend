@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.example.samplespringboot.dto.UserRequestDTO;
 import org.example.samplespringboot.dto.UserResponseDTO;
 import org.example.samplespringboot.entity.User;
+import org.example.samplespringboot.entity.UserRole;
 import org.example.samplespringboot.exception.ResourceNotFoundException;
 import org.example.samplespringboot.exception.DuplicateResourceException;
 import org.example.samplespringboot.repository.UserRepository;
+import org.example.samplespringboot.repository.UserRoleRepository;
 import org.example.samplespringboot.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserRoleRepository userRoleRepository;
 
     @Override
     public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
@@ -64,6 +67,18 @@ public class UserServiceImpl implements UserService {
         user.setFirstName(userRequestDTO.getFirstName());
         user.setLastName(userRequestDTO.getLastName());
         user.setEmail(userRequestDTO.getEmail());
+        // Update password if provided
+        if (userRequestDTO.getPassword() != null && !userRequestDTO.getPassword().isEmpty()) {
+            user.setPassword(userRequestDTO.getPassword());
+        }
+
+        // Update role if provided
+        if (userRequestDTO.getRoleId() != null) {
+            UserRole role = userRoleRepository.findById(userRequestDTO.getRoleId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Role not found with id: " + userRequestDTO.getRoleId()));
+            user.setRole(role);
+        }
+
         user.setPhoneNumber(userRequestDTO.getPhoneNumber());
         user.setAddress(userRequestDTO.getAddress());
 
