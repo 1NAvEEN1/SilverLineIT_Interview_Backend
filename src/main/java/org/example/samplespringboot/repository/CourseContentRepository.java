@@ -8,7 +8,6 @@ import java.util.List;
 
 @Repository
 public interface CourseContentRepository extends JpaRepository<CourseContent, Long> {
-    List<CourseContent> findByCourseIdAndIsDeletedFalse(Long courseId);
-    List<CourseContent> findByUploadedByIdAndIsDeletedFalse(Long userId);
+
 }
 

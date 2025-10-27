@@ -35,8 +35,10 @@ public class Course {
     @JoinColumn(name = "instructor_id", nullable = false)
     private User instructor;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CourseContent> contents = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(name = "course_files", joinColumns = @JoinColumn(name = "course_id"))
+    @Column(name = "course_content")
+    private List<String> courseContents = new ArrayList<>();
 
     @CreationTimestamp
     @Column(updatable = false)

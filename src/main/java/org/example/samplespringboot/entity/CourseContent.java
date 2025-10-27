@@ -23,9 +23,6 @@ public class CourseContent {
     private Long id;
 
     @Column(nullable = false, length = 255)
-    private String fileNameOriginal;
-
-    @Column(nullable = false, length = 255)
     private String fileName;
 
     @Column(nullable = false, length = 255)
@@ -42,17 +39,8 @@ public class CourseContent {
     @Column(nullable = false, updatable = false)
     private Date uploadDate;
 
-    @ManyToOne
-    @JoinColumn(name = "course_id", nullable = false)
-    private Course course;
-
-    @ManyToOne
-    @JoinColumn(name = "uploaded_by", nullable = false)
-    private User uploadedBy;
-
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isDeleted = false;
-
 
     @CreatedDate
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
