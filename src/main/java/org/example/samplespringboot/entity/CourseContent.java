@@ -37,10 +37,10 @@ public class CourseContent {
     @Column(nullable = false)
     private Long fileSize;
 
-    @CreationTimestamp
+    @CreatedDate
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(nullable = false, updatable = false)
-    private LocalDateTime uploadDate;
-
+    private Date uploadDate;
 
     @ManyToOne
     @JoinColumn(name = "course_id", nullable = false)

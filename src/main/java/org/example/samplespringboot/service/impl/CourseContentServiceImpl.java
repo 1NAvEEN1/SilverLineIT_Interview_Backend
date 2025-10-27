@@ -74,7 +74,6 @@ public class CourseContentServiceImpl implements CourseContentService {
         courseContent.setFileName(file.getOriginalFilename());
         courseContent.setFileType(file.getContentType());
         courseContent.setFileSize(file.getSize());
-        courseContent.setFileUrl(fileName);
         courseContent.setCourse(course);
         courseContent.setUploadedBy(user);
 
@@ -201,8 +200,6 @@ public class CourseContentServiceImpl implements CourseContentService {
         dto.setFileName(content.getFileName());
         dto.setFileType(content.getFileType());
         dto.setFileSize(content.getFileSize());
-        dto.setUploadDate(content.getUploadDate());
-        dto.setFileUrl(content.getFileUrl());
         dto.setCourseId(content.getCourse().getId());
         dto.setCourseName(content.getCourse().getCourseName());
         dto.setUploadedByUserId(content.getUploadedBy().getId());
