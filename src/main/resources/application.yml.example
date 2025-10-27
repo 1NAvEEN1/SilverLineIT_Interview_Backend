@@ -1,0 +1,25 @@
+# Alternative YAML configuration (optional)
+# Rename this to application.yml and delete application.properties to use this
+
+#spring:
+#  application:
+#    name: Sample-SpringBoot
+#
+#  datasource:
+#    url: jdbc:mysql://localhost:3306/userdb?createDatabaseIfNotExist=true
+#    username: root
+#    password: root
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#    show-sql: true
+#    properties:
+#      hibernate:
+#        format_sql: true
+#        dialect: org.hibernate.dialect.MySQLDialect
+#
+#server:
+#  port: 8080
+
