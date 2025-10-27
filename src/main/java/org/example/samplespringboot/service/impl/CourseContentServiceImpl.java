@@ -88,7 +88,7 @@ public class CourseContentServiceImpl implements CourseContentService {
 
     @Override
     public List<CourseContentResponseDTO> getContentsByCourseId(Long courseId) {
-        List<CourseContent> contents = courseContentRepository.findByCourseId(courseId);
+        List<CourseContent> contents = courseContentRepository.findByCourseIdAndIsDeletedFalse(courseId);
         return contents.stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
@@ -96,7 +96,7 @@ public class CourseContentServiceImpl implements CourseContentService {
 
     @Override
     public List<CourseContentResponseDTO> getContentsByUserId(Long userId) {
-        List<CourseContent> contents = courseContentRepository.findByUploadedById(userId);
+        List<CourseContent> contents = courseContentRepository.findByUploadedByIdAndIsDeletedFalse(userId);
         return contents.stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
@@ -116,11 +116,10 @@ public class CourseContentServiceImpl implements CourseContentService {
         CourseContent content = courseContentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Content not found with id: " + id));
 
-        // Delete file from storage
-        fileStorageService.deleteFile(content.getFileUrl());
-
-        // Delete from database
-        courseContentRepository.delete(content);
+        // Soft delete: mark as deleted instead of removing from database
+        content.setIsDeleted(true);
+        content.setDeletedAt(java.time.LocalDateTime.now());
+        courseContentRepository.save(content);
     }
 
     private void validateFile(MultipartFile file) {

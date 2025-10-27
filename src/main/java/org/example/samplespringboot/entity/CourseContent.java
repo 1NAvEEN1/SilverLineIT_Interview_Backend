@@ -42,5 +42,10 @@ public class CourseContent {
     @ManyToOne
     @JoinColumn(name = "uploaded_by", nullable = false)
     private User uploadedBy;
+
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean isDeleted = false;
+
+    private LocalDateTime deletedAt;
 }
 
