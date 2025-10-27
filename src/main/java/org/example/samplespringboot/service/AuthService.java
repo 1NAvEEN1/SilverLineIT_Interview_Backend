@@ -74,28 +74,28 @@ public class AuthService {
 
     @Transactional
     public AuthResponseDTO login(LoginRequestDTO request) {
+        AuthResponseDTO authResponseDTO = new AuthResponseDTO();
         // Find user by email
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
 
         // Verify password
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new BadCredentialsException("Invalid email or password");
+            authResponseDTO.setMessage("Invalid email or password");
         }
 
         // Generate tokens
         String accessToken = jwtService.generateToken(user.getEmail(), user.getId(), user.getRole().getName());
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 
-        return AuthResponseDTO.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken.getToken())
-                .tokenType("Bearer")
-                .userId(user.getId())
-                .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .build();
+        authResponseDTO.setAccessToken(accessToken);
+        authResponseDTO.setRefreshToken(refreshToken.getToken());
+        authResponseDTO.setTokenType("Bearer");
+        authResponseDTO.setUserId(user.getId());
+        authResponseDTO.setEmail(user.getEmail());
+        authResponseDTO.setFirstName(user.getFirstName());
+        authResponseDTO.setLastName(user.getLastName());
+        return authResponseDTO;
     }
 
     @Transactional
